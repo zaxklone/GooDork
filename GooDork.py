@@ -1,8 +1,10 @@
 #!/usr/bin/python
 import sys
-import Operator
 import getopt
 import time
+
+import Operator
+
 
 results = []
 """
@@ -56,16 +58,14 @@ class GooDork:
         # Creation of Result objects here so gooDork will print more results ;)
         results = []
         if len(sys.argv[1:]) == 0:
-            self.usage()
-            sys.exit()
+            self.usage(sysexit=True)
         try:
             opts, args = getopt.getopt(sys.argv[2:], "o:a:b:u:t:s:L:U:")
             print opts
         except getopt.GetoptError, e:
             # will be logged later
             print (e)
-            self.usage()
-            sys.exit()
+            self.usage(sysexit=True)
         # need to change this aswell
         # if any option is set that requires the processing of the HTML,
         # get the html first!
@@ -78,8 +78,6 @@ class GooDork:
         for opt, arg in opts:  # set the user agent
             if opt == '-U':
                 self.setUserAgent(arg)
-        # elif opt != '-U':
-        #     hasOtherArgs=True
         start = time.time()
         links = []
         res = [1]
@@ -106,6 +104,8 @@ class GooDork:
         # looked after by the operator
                 break
         for opt, arg in opts:
+            results += self._append_results(opt, arg, results)
+            '''
             if opt == '-b':
                 # print "intext:",arg
                 self.hasRegexOption = True
@@ -129,6 +129,7 @@ class GooDork:
             if opt == '-o':
                 self.hasOutPutFile = True
                 self.outputFile = arg
+            '''
         finish = time.time()
         results = set(results)  # I just OR the results for now
         if len(results) != 0 and self.hasRegexOption:
@@ -158,7 +159,33 @@ class GooDork:
         else:
             print "No Results match your regex"
 
-    def usage(self):
+    def _append_results(self, opt, arg, results):
+        if opt == '-b':
+            # print "intext:",arg
+            self.hasRegexOption = True
+            results += self.intext(arg)
+        if opt == '-a':
+            # print "inanchor:",arg
+            self.hasRegexOption = True
+            results += self.inanchor(arg)
+        if opt == '-t':
+            # print "intitle:",arg
+            self.hasRegexOption = True
+            results += self.intitle(arg)
+        if opt == '-u':
+            # print "inurl:",arg
+            self.hasRegexOption = True
+            results += self.inurl(arg)
+        if opt == '-s':
+            # print "inurl:",arg
+            self.hasRegexOption = True
+            results += self.inscript(arg)
+        if opt == '-o':
+            self.hasOutPutFile = True
+            self.outputFile = arg
+        return results
+
+    def usage(self, sysexit=False):
         print """version 2.2.1
 
 Usage: ./GooDork [dork] {options}
@@ -180,6 +207,8 @@ e.g ./GooDork site:.edu -bStudents #returns urls to all pages in the
 e.g ./GooDork site:.edu -o universities.txt #returns urls to all pages in the
 .edu 'universities.txt'
 """
+        if sysexit is True:
+            sys.exit()
 
     # need to rewrite this, so it makes full use of the Result Object
     def inurl(self, pattern):

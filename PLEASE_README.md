@@ -7,3 +7,8 @@ structure and codebase of version 2.
 part of understanding version 2 is the following.
 
 1. Making the code more readable and understandable by making it pass pep8 and refactoring the longer portions of the code.
+
+
+# TODO
+
+1. Refactor run() in GooDork.py
